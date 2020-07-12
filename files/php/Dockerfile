@@ -1,7 +1,6 @@
 FROM php:7.2-fpm
 LABEL maintainer="pandaxnm"
 
-
 # set timezome
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -20,9 +19,9 @@ RUN apt-get update && apt-get install -y \
         && docker-php-ext-install mysqli \
         && rm -r /var/lib/apt/lists/*
 
-# Copy extensions had downloaded
-COPY ./pkg/redis.tgz /home/redis.tgz
-COPY ./pkg/cphalcon.tar.gz /home/cphalcon.tar.gz
+# Download redis and cphalcon
+RUN curl https://pecl.php.net/get/redis-3.1.6.tgz -o /home/redis.tgz
+RUN curl https://codeload.github.com/phalcon/cphalcon/tar.gz/v3.3.1 -o /home/cphalcon.tar.gz
 
 # Install PECL extensions (Redis)
 RUN pecl install /home/redis.tgz && echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini

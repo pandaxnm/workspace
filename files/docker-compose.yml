@@ -79,8 +79,8 @@ services:
       - "21:21"
       - "30000-30009:30000-30009"
     volumes:
-      - "../ftp/data:/home/username/"
-      - "../ftp/passwd:/etc/pure-ftpd/passwd"
+      - "../data/ftp/data:/home/username/"
+      - "../data/ftp/passwd:/etc/pure-ftpd/passwd"
     environment:
       PUBLICHOST: "localhost"
       FTP_USER_NAME: username
