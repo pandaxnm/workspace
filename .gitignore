@@ -5,6 +5,7 @@
 /data/backup/
 /data/mysql/
 /data/ftp/
+/data/es/
 !/data/backup/README.txt
 !/data/mysql/README.txt
 /logs/mysql/*.log

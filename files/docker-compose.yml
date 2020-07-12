@@ -61,6 +61,7 @@ services:
     volumes:
       - ../data/redis:/data
     restart: always
+
   myadmin:
     build: ./phpmyadmin
     container_name: phpmyadmin
@@ -72,6 +73,7 @@ services:
     restart: always
     depends_on:
       - mysql-db
+
   ftpd_server:
     build: ./ftp
     container_name: pure-ftpd
@@ -87,3 +89,16 @@ services:
       FTP_USER_PASS: password
       FTP_USER_HOME: /home/username
     restart: always
+
+  elasticsearch:
+    build: ./elasticsearch
+    container_name: gs-search
+    volumes:
+      - ../data/es:/usr/share/elasticsearch/data
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ports:
+      - "9300:9300"
+      - "9200:9200"
