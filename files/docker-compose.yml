@@ -1,0 +1,89 @@
+version: '3.2'
+services:
+  php-fpm:
+    build: ./php/
+    container_name: php-fpm
+    ports:
+      - "9000:9000"
+    links:
+      - mysql-db:mysql-db
+      - redis-db:redis-db
+    volumes:
+      - ../app:/data/www:rw
+      - ./php/php.ini:/usr/local/etc/php/php.ini:ro # 当前php配置文件；可以拷贝修改php-dev.ini为想要的配置
+      - ./php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+      - ../logs/php-fpm:/var/log/php-fpm:rw
+    restart: always
+    command: php-fpm
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    depends_on:
+      - php-fpm
+    links:
+      - php-fpm:php-fpm
+    volumes:
+      - ../app:/data/www:rw
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs/:/etc/nginx/certs
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../logs/nginx:/var/log/nginx
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    restart: always
+    command: nginx -g 'daemon off;'
+
+  mysql-db:
+    build: ./mysql
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../data/mysql:/var/lib/mysql:rw
+      - ../logs/mysql:/var/lib/mysql-logs:rw
+      - ./mysql/conf.d:/etc/mysql/conf.d:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: username
+      MYSQL_PASSWORD: pqssword
+    restart: always
+    command: "--character-set-server=utf8"
+
+  redis-db:
+    build: ./redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../data/redis:/data
+    restart: always
+  myadmin:
+    build: ./phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql-db
+    restart: always
+    depends_on:
+      - mysql-db
+  ftpd_server:
+    build: ./ftp
+    container_name: pure-ftpd
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    volumes:
+      - "../ftp/data:/home/username/"
+      - "../ftp/passwd:/etc/pure-ftpd/passwd"
+    environment:
+      PUBLICHOST: "localhost"
+      FTP_USER_NAME: username
+      FTP_USER_PASS: password
+      FTP_USER_HOME: /home/username
+    restart: always
