@@ -46,6 +46,7 @@ services:
       - ../logs/mysql:/var/lib/mysql-logs:rw
       - ./mysql/conf.d:/etc/mysql/conf.d:ro
     environment:
+      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -74,31 +75,31 @@ services:
     depends_on:
       - mysql-db
 
-  ftpd_server:
-    build: ./ftp
-    container_name: pure-ftpd
-    ports:
-      - "21:21"
-      - "30000-30009:30000-30009"
-    volumes:
-      - "../data/ftp/data:/home/username/"
-      - "../data/ftp/passwd:/etc/pure-ftpd/passwd"
-    environment:
-      PUBLICHOST: "localhost"
-      FTP_USER_NAME: username
-      FTP_USER_PASS: password
-      FTP_USER_HOME: /home/username
-    restart: always
+#  ftpd_server:
+#    build: ./ftp
+#    container_name: pure-ftpd
+#    ports:
+#      - "21:21"
+#      - "30000-30009:30000-30009"
+#    volumes:
+#      - "../data/ftp/data:/home/username/"
+#      - "../data/ftp/passwd:/etc/pure-ftpd/passwd"
+#    environment:
+#      PUBLICHOST: "localhost"
+#      FTP_USER_NAME: username
+#      FTP_USER_PASS: password
+#      FTP_USER_HOME: /home/username
+#    restart: always
 
-  elasticsearch:
-    build: ./elasticsearch
-    container_name: gs-search
-    volumes:
-      - ../data/es:/usr/share/elasticsearch/data
-    environment:
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - discovery.type=single-node
-    ports:
-      - "9300:9300"
-      - "9200:9200"
+#  elasticsearch:
+#    build: ./elasticsearch
+#    container_name: gs-search
+#    volumes:
+#      - ../data/es:/usr/share/elasticsearch/data
+#    environment:
+#      - bootstrap.memory_lock=true
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#      - discovery.type=single-node
+#    ports:
+#      - "9300:9300"
+#      - "9200:9200"
