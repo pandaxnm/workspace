@@ -57,7 +57,7 @@ cd workspace/app
 docker run -it --rm -v `pwd`:/data/www/ -w /data/www/appname files_php-fpm composer update
 ```
 ## 目录结构
-- `app` - 网站应用
+- `app/` - 网站应用
 - `file/nginx/conf.d/` nginx配置文件目录
 - `file/.env` 环境变量
 
