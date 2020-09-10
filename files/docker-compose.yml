@@ -10,7 +10,7 @@ services:
       - redis-db:redis-db
     volumes:
       - ../app:/data/www:rw
-      - ./php/php.ini:/usr/local/etc/php/php.ini:ro # 当前php配置文件；可以拷贝修改php-dev.ini为想要的配置
+      - ./php/php.ini:/usr/local/etc/php/php.ini:ro
       - ./php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
       - ../logs/php-fpm:/var/log/php-fpm:rw
     restart: always
@@ -46,7 +46,7 @@ services:
       - ../logs/mysql:/var/lib/mysql-logs:rw
       - ./mysql/conf.d:/etc/mysql/conf.d:ro
     environment:
-      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
+      # MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -67,7 +67,7 @@ services:
     build: ./phpmyadmin
     container_name: phpmyadmin
     ports:
-      - "8081:80"
+      - "8082:80"
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=mysql-db

@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.4-fpm
 LABEL maintainer="pandaxnm"
 
 # set timezome
@@ -6,6 +6,10 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY ./sources.list /etc/apt/sources.list
+
+COPY bluecity-qconf_1.2.3-1_amd64.deb bluecity-qconf_1.2.3-1_amd64.deb
+# 安装qconf
+RUN dpkg -i bluecity-qconf_1.2.3-1_amd64.deb
 
 # Install package and PHP Core extensions
 RUN apt-get update && apt-get upgrade -y \
@@ -32,11 +36,82 @@ RUN apt-get update && apt-get upgrade -y \
     unzip \
     wget \
     zlib1g-dev \
+    git \
+    cmake \
+    automake \
+    autoconf \
+    unzip \
+    curl \
+    libzip-dev \
+    m4 \
+    perl \
+    libtool \
+    libtool-bin \
+#    texinfo \
+#    && cd /tmp \
+#    && wget https://ftp.gnu.org/gnu/automake/automake-1.14.tar.gz \
+#    && tar -xzvf automake-1.14.tar.gz \
+#    && cd automake-1.14 \
+#    && ./configure \
+#    && make && make install \
+#    && cd /tmp \
+#    && wget https://ftp.gnu.org/gnu/automake/automake-1.11.tar.gz \
+#    && tar -xzvf automake-1.11.tar.gz \
+#    && cd automake-1.11 \
+#    && ./configure \
+#    && make && make install \
+#    # 安装 QConf
+#    && git clone https://github.com/Qihoo360/QConf.git \
+#    && cd QConf \
+#    && mkdir build && cd build \
+#    && cmake .. \
+#    && make \
+#    && make install \
+#    && cd ../driver/php \
+#    && phpize \
+#    && ./configure \
+#    && make \
+#    && make install \
+#    && docker-php-ext-enable qconf \
+    # 安装 swoole
+    && cd /tmp \
+    && wget https://github.com/swoole/swoole-src/archive/master.tar.gz \
+    && tar zxvf master.tar.gz \
+    && cd swoole-src-master \
+    && phpize \
+    && ./configure \
+    --enable-openssl \
+    --enable-http2 \
+    && make \
+    && make install \
+    && docker-php-ext-enable swoole \
+    && cd /tmp \
+    # 安装 rdkafka
+    && git clone https://github.com/edenhill/librdkafka.git \
+    && cd librdkafka \
+    && ./configure \
+    && make \
+    && make install \
+    && cd /tmp \
+    # 安装 amqp
+    && git clone https://github.com/alanxz/rabbitmq-c \
+    && cd rabbitmq-c \
+    && mkdir build && cd build \
+    && cmake .. \
+    && make \
+    && make install \
+    && cd /tmp \
+    # 安装 ffi
+    && wget https://github.com/libffi/libffi/releases/download/v3.3/libffi-3.3.tar.gz \
+    && tar zxvf libffi-3.3.tar.gz \
+    && cd libffi-3.3 \
+    && ./configure \
+    && make && make install \
     && docker-php-ext-configure gd \
-    --with-freetype-dir=/usr/include/ \
-    --with-jpeg-dir=/usr/include/ \
-    --with-png-dir=/usr/include/ \
+    --with-freetype=/usr/include/ \
+    --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install -j$(nproc) ffi \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install -j$(nproc) imap \
     && docker-php-ext-configure intl \
@@ -60,8 +135,12 @@ RUN apt-get update && apt-get upgrade -y \
     xsl \
     zip \
     && pecl install xdebug && docker-php-ext-enable xdebug \
-    && pecl install mongodb && docker-php-ext-enable mongodb \
     && pecl install redis && docker-php-ext-enable redis \
+    && pecl install rdkafka && docker-php-ext-enable rdkafka \
+    && pecl install amqp && docker-php-ext-enable amqp \
+    && pecl install apcu && docker-php-ext-enable apcu \
+    && pecl install uuid && docker-php-ext-enable uuid \
+    && pecl install msgpack && docker-php-ext-enable msgpack \
     && yes '' | pecl install imagick && docker-php-ext-enable imagick \
     && docker-php-source delete \
     && apt-get remove -y g++ wget \
