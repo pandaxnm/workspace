@@ -11,6 +11,10 @@ COPY bluecity-qconf_1.2.3-1_amd64.deb bluecity-qconf_1.2.3-1_amd64.deb
 # 安装qconf
 RUN dpkg -i bluecity-qconf_1.2.3-1_amd64.deb
 
+RUN echo "test" > /usr/local/qconf/conf/localidc && /bin/bash /etc/init.d/qconf-agent start
+# for golang
+#RUN ln -s /usr/local/qconf/lib/libqconf.so /usr/lib/
+
 # Install package and PHP Core extensions
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y \
@@ -60,19 +64,19 @@ RUN apt-get update && apt-get upgrade -y \
 #    && cd automake-1.11 \
 #    && ./configure \
 #    && make && make install \
-#    # 安装 QConf
-#    && git clone https://github.com/Qihoo360/QConf.git \
-#    && cd QConf \
-#    && mkdir build && cd build \
+    # 安装 QConf
+    && git clone https://github.com/Qihoo360/QConf.git \
+    && cd QConf \
+    && mkdir build && cd build \
 #    && cmake .. \
 #    && make \
 #    && make install \
-#    && cd ../driver/php \
-#    && phpize \
-#    && ./configure \
-#    && make \
-#    && make install \
-#    && docker-php-ext-enable qconf \
+    && cd ../driver/php \
+    && phpize \
+    && ./configure LDFLAGS=/usr/local/qconf/lib/libqconf.a \
+    && make \
+    && make install \
+    && docker-php-ext-enable qconf \
     # 安装 swoole
     && cd /tmp \
     && wget https://github.com/swoole/swoole-src/archive/master.tar.gz \
